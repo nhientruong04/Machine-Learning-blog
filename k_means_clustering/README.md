@@ -17,21 +17,14 @@ Now, let's start defining our observation and label matrix. Our observation matr
 and our label matrix should have a similar form  
 ![label_matrix](./label_matrix.png)  
 An observation will have its corresponding label vector $y$. Each element of the vector represents its binary value of that corresponding centroid. For example, suppose we have a dataset of real-estate properties having 2 features for each observation, which are the total area and prices. Then our observation matrix will have 2 rows (2 features) and N columns (depend on how large our dataset). Suppose we have magically known there are 4 groups those properties will be classified into (4 clusters), then our label matrix should have 4 rows and N columns. Now, in order to express that observation $x_1$ belongs to the $3^{rd}$ centroid, its corresponding label vector $y_1$ will have the form
-$\begin{bmatrix}
-0 \\
-0 \\
-1 \\
-0 \\
-\end{bmatrix}$
+![label matrix](https://latex.codecogs.com/svg.image?%5Cbg%7Bwhite%7D%5Cbegin%7Bbmatrix%7D0%5C%5C0%5C%5C1%5C%5C0%5Cend%7Bbmatrix%7D)
 . Since each observation can only belong to a single centroid, if $x_1$ is classified into group $k$, then $y_{ik}=1$ and $y_{ij}=0, \forall j \neq k$. So, we've just form our conditions for the label vectors.
 $$y_{ij} \in \{0, 1\}, \sum_{j=1}^K y_{ij}=1$$  
 
 ### Let's jump into a lava pool full of math notations
 **Loss function**  
-Let's call our centroids as $\mathbf{m}$, then we'll need to calculate the loss for each centroid. In this problem, for a 2-d dataset (points as observations), the loss for each point can be calculated as the [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance) from that point to its centroid. The loss from point $x_1 (a, b) \text{ to its centroid } m_k(c, d)$ is
-$$
-d(x_1, m_k) = \sqrt{(a - c)^2 + (b - d)^2} = \lVert \mathbf{x_1 - m_k} \rVert_2
-$$
+Let's call our centroids as $\mathbf{m}$, then we'll need to calculate the loss for each centroid. In this problem, for a 2-d dataset (points as observations), the loss for each point can be calculated as the [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance) from that point to its centroid. The loss from point $x_1 (a, b) \text{ to its centroid } m_k(c, d)$ is  
+![Euclidean Equation](https://latex.codecogs.com/svg.image?%5Cbg%7Bwhite%7Dd(x_1,m_k)=%5Csqrt%7B(a-c)%5E2&plus;(b-d)%5E2%7D=%5ClVert%5Cmathbf%7Bx_1-m_k%7D%5CrVert_2)  
 *Note: the number $_2$ is the power of the difference between two points in the square root*  
 Next, we'll square it to get rid of the square root, regulize it and apply the label vector as $y_{ik}=1$, $y_{ij}=0$, $\forall j \neq k$
 $$
