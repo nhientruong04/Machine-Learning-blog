@@ -5,7 +5,9 @@
 ![K-means clustering example](image/k-means-example-sklearn.png)  
 *Source: scikit-learn webpage*  
 
-So, the algorithm is built with centroids, calculated by the mean distances to all of the observations in their own area, and the observations (points in 2-D), which are partitioned to the centroids base on their distances to them (belongs to centroid A if they are nearest to A compared to other centroids B, C, D). If you understand this concept, congratulation, you've just grasped the essence of the k-means clustering algorithm.  
+So, the algorithm is built with centroids calculated by the mean distances to all of the observations in their own area, and the observations (points in 2-D), which are partitioned to the centroids base on their distances to them (belongs to centroid A if they are nearest to A compared to other centroids B, C, D). If you understand this concept, congratulation, you've just grasped the essence of the k-means clustering algorithm.  
+
+This algorithm is for **unsupervised learning problems**. Usually, a **supervised** problem consists of a dataset having a certain amount of features as inputs, and a label vector which acts like a set of answers for the predictions originated from that dataset. In contrast, an **unsupervised** problem only provides a dataset with no attached or defined label vector; hence, in this problem, we need to group or partition the dataset into different clusters. This kind of problems can be seen regularly in real life in tasks requiring us to separate or group customers based on their spending, or items tiers based on their prices. To be more specific, a company can use this grouping method for this unsupervised problem to classify their customers into groups, and then prepare marketing plans, which would target each group with a different approach.
 <!-- unsupervised -->
  
 ## 2. The real algorithm
@@ -20,3 +22,141 @@ To sum it up, our algorithm consists of the following things:
 <!-- -->
 
 ## 3. Apply with Python
+First of all, we'll need to import necessary libraries and set the random seed for our program.
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.spatial.distance import cdist
+
+np.random.seed(20)
+```
+The *numpy* is used for working with arrays, specifically our dataset, *matplotlib* for plotting and **cdist** from the *scipy* library to calculate the Euclidean norm (distance). You can set the seed with different a number. This concept is called [Pseudo random](https://en.wikipedia.org/wiki/Pseudorandom_number_generator) and the seed number which we provided the program is used to regenerate the same random set of numbers in the next run or in another computer. Next, we'll create our own dataset:
+```python
+#create 2-D dataset
+means = [[2, 2], [8, 3], [3, 6]]
+cov = [[1, 0], [0, 1]]
+N = 200
+X0 = np.random.multivariate_normal(means[0], cov, N)
+X1 = np.random.multivariate_normal(means[1], cov, N)
+X2 = np.random.multivariate_normal(means[2], cov, N)
+
+X = np.concatenate((X0, X1, X2), axis = 0) #number of observations
+K = 3 #number of clusters
+
+original_label = np.asarray([0]*N + [1]*N + [2]*N).T #true labels
+```
+We're going to play with a dataset with 3 clusters (you don't need to actually understand the process I'm using to create the dataset). If you read other articles about implementing the K-means algorithm with Python on other websites, you'll see they often use the **make_blobs** from *sklearn.datasets* to create the same type of data as the process I'm using. Now we'll try to plot the dataset with our defined labels to see the shape of it
+```python
+def kmeans_plot(data, labels):
+    '''Plotting dataset'''
+
+    K = max(labels) + 1
+    fig, ax = plt.subplots()
+
+    for i in range(K):
+        x = data[labels == i, 0]
+        y = data[labels == i, 1]
+
+        ax.scatter(x, y, s=10, alpha=.8)
+    ax.set_title(f'Dataset X with {data.shape[0]} observations and {K} clusters
+```
+```python
+kmeans_plot(X, original_label)
+```
+![demo picture](image/demo_pic.png)  
+Looks good! If you want more observations, more points on the plot, just increase `N`. Now, this looks perfect because we've defined the labels for our dataset, which won't happen in real life since we use K-means for datasets that don't have labels. Just imagine when you have no label, you now have to implement the algorithm to find your label vector. Remember the steps? Remember that we need at least 2 functions to *assign labels* and *update centroids* for step 2 and 4
+```python
+def assign_label(data, centroids):
+    #calculate distance of each point to all centroids
+    D = cdist(data, centroids)
+
+    #get the nearest centroid
+    labels = np.argmin(D, axis=1)
+
+    return labels
+
+def update_centroids(data, labels, centroid_id):
+    #get all points within the cluster of centroid = centroid_id
+    centroid_points = data[labels == centroid_id, :]
+
+    #compute new centroid of that cluster
+    new_centroid = np.mean(centroid_points, axis=0)
+
+    return new_centroid
+```
+For step 2, assigning labels requires us to calculate the distance from each points to all the centroids, which is the use of *cdist*. If you find it strange to understand the blackbox behind this function, copy the code and try it yourself (usually beginners in ML are unfamiliar to concepts of ndarrays in *numpy*), you can find numpy tutorials or read the docs on their page. After calculating the distances, we construct a new label vector for each point using the *argmin* method. For example, suppose we have an ndarray `[0.5, 0.18, 0.932]`, the *min* value will be `0.18` but the *argmin* value will be `2`. With this technique, we are able to assgin the labels for their respective observations as their nearest centroids. Step 4 is straight-forward, since we're calculating the new centroid for a specific cluster. As you can see, this function only operates for a single cluster as we'll put it in a loop to calculate for all centroids with their respective **centroid_id** ```[0, 1, 2]```.  
+After constructing these main functions, we'll put them together in our K-means function using for training. 
+```python
+def k_means(data, K, max_it_num=10):
+    '''Execute the K-means algorithm'''
+
+    def assign_label(data, centroids):
+        #calculate distance of each point to all centroids
+        D = cdist(data, centroids)
+
+        #get the nearest centroid
+        labels = np.argmin(D, axis=1)
+
+        return labels
+
+    def update_centroids(data, labels, centroid_id):
+        #get all points within the cluster of centroid = centroid_id
+        centroid_points = data[labels == centroid_id, :]
+
+        #compute new centroid of that cluster
+        new_centroid = np.mean(centroid_points, axis=0)
+
+        return new_centroid
+
+    #step 1
+    centroids = data[np.random.choice(data.shape[0], K, replace=False)]
+
+    #log labels of the dataset
+    labels_hist = []
+    it_count = 0
+
+    for _ in range(max_it_num):
+        #step 2
+        label = assign_label(data, centroids)
+
+        #step 3. Compare the newly calculated labels with the previous set
+        if len(labels_hist) != 0 and (label == labels_hist[-1]).all():
+            break
+        
+        #logging labels
+        labels_hist.append(label)
+
+        #step 4
+        for centroid_id in range(K):
+            centroids[centroid_id] = update_centroids(data, label, centroid_id)
+
+        it_count += 1
+    
+    return (it_count, labels_hist[-1], centroids)
+```
+If you look closely, we now have step 1 in our function, which is initializing centroids for the first iteration. Initializing centroids are important (discussed later) in our traning process since it could affect the cost or even the output of our algorithm. There are multiple K-means initializing method but we'll deploy the simplest method: **random**. We use *random.choice* to random *K* indices of observations in our dataset. Next, a logging method for our label vector history is also required as we need to compare the newly calculated label vector with the latest one (step 2). Then, all the steps are put in a `for` loop to apply the algorithm again and again till we have our answers. As you can see, the code in the loop follows exactly the same as the steps I've covered, except now we need to log the label vector calculations.  
+Let's run this bunch, shall we?
+```python
+(n, labels, centroids) = k_means(X, 3, 30)
+print(f'Total iterations: {n}')
+print(f'All centroids: {centroids}')
+```
+![Demo the first run](image/algo_demo.png)  
+Noice~~ We only need 5 loops to have our clusters, looks like K-means is quite nice. Let's plot it out
+```python
+kmeans_plot(X, labels)
+```
+![First run plot](image/algo_demo_plot.png)  
+Perfect! Since this blog is for learning and introduce you to K-means, I need to code the algorithm from scratch, but from now on you'll only need to apply the KMeans class from the famous [scikit-learn](https://scikit-learn.org/stable/index.html) library. Let's test it!
+```python
+from sklearn.cluster import KMeans
+
+kmeans = KMeans(n_clusters=3, random_state=20, init='random').fit(X)
+print(f'All centroids: {kmeans.cluster_centers_}')
+```
+![Sklearn output](image/sklearn_demo.png)
+```python
+kmeans_plot(X, kmeans.labels_)
+```
+![Sklearn plot](image/sklearn_demo_plot.png)  
+Obviously, our centroids order is different from what we get using sklearn, but it doesn't matter, since the coordinates for the centroids are all the same! For more information about this class of sklearn, you can find their doc [here](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html). GGEZ!
