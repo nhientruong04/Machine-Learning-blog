@@ -1,4 +1,10 @@
 # (*Machine Learning*) A brief look at K-Means Clustering
+## 0. Some notes
+*Warning!* This repo is made by a Computer Science undergraduate. Please consider it as a small reference or a fresh view about the target topic. And please let me know if there are any problems or mistakes, and correct me if I'm wrong!  
+
+Before trying the algorithm with Python below, I suggest taking a quick look at the Maths behind this algo in the **pdf** math file to have a firm background assuring the fundamental knowledge about what's happening behind the whole process. You can clone this repo for the codes in the *algorithm_demo.ipynb* or the *source.ipynb* for the codes I use to generate pictures and GIFs.  
+
+This topic is quite large to fit in a single blog, so I decided to talk about clusters initialization algorithm and other evaluation metrics of K-means later in another blog.
 ## 1. Introduction
 > "K-means clustering is a method of vector quantization, originally from signal processing, that aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean (cluster centers or cluster centroid), serving as a prototype of the cluster. This results in a partitioning of the data space into Voronoi cells." - *Wikipedia*
 <!-- -->
@@ -160,3 +166,11 @@ kmeans_plot(X, kmeans.labels_)
 ```
 ![Sklearn plot](image/sklearn_demo_plot.png)  
 Obviously, our centroids order is different from what we get using sklearn, but it doesn't matter, since the coordinates for the centroids are all the same! For more information about this class of sklearn, you can find their doc [here](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html). GGEZ!
+
+## 4. 
+
+## 5. References
+This blog is heavily inspired this [article](https://machinelearningcoban.com/2017/01/01/kmeans/). Most of the math I've introduced in the pdf file is taken from it (with some slight changes based on other sources and my understanding). I (probably) won't find any other detailed explanation like this article. More source,
+- [Deep Ai Khanhblog](https://phamdinhkhanh.github.io/deepai-book/ch_ml/KMeans.html#su-hoi-tu-cua-thuat-toan-k-means-clustering): another detailed Vietnamese blog from 
+- [Analyticsvidhya](https://www.analyticsvidhya.com/blog/2019/08/comprehensive-guide-k-means-clustering/): doesn't have math but provides evaluation metrics (about which I'll have another blog)
+- [towardsdatascience](https://towardsdatascience.com/k-means-clustering-algorithm-applications-evaluation-methods-and-drawbacks-aa03e644b48a): comprehensive but I haven't finished
