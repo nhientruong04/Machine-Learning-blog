@@ -167,8 +167,31 @@ kmeans_plot(X, kmeans.labels_)
 ![Sklearn plot](image/sklearn_demo_plot.png)  
 Obviously, our centroids order is different from what we get using sklearn, but it doesn't matter, since the coordinates for the centroids are all the same! For more information about this class of sklearn, you can find their doc [here](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html). GGEZ!
 
-## 4. 
+## 4. Downsides
+Since K-means is a simple and fundamental algorithm, it has various critical weaknesses.
+### Unavailability of cluster number
+K-means need *K* clusters to be specified by the user to execute, which is not known by any ways. Therefore, you need to employ the algorithm through *trials and errors* manually using other evaluation metrics such as the *elbow method* or *silhouette score* to define the best K. These will be discussed at the next blog.
 
+### Greatly depends on clusters initialization process
+In this blog, I used the primitive method of randomization to create centroids for the first run. This could result in fast learning models as the one below, which only took 5 iterations to complete.  
+![Fast run with lucky initialization](image/fast_run.gif)
+
+As you can see, this run commenced with a relatively good set of centroids which are evenly distributed to the 3 clusters. However, what will happen if we have initially 2 centroids placed near to each other in a small area, with the other one placed at the rest half of the plot?  
+![Slow run with unlucky initialization](image/slow_run.gif)
+
+Or even incorrect results.  
+![Wrong result](image/local_minimum_run.gif)
+
+### Imperfect dataset structure
+Datasets with uniformly or normally distributed observations are preferred. This infers datasets with even variance for all features (even variance just as having our covariance matrix `[[1,0],[0,1]]` which results in 2-D circle-shape data points) will work properly. Several defects or factors in the dataset that would potentially affect the algorithm are *clusters are not circles * (for 2-D observations), *outliers* or *uneven number of observations among clusters*.  
+
+This incapability can be clearly presented for 2-D dataset, such as this run with a dataset having an uneven variance for all features. **A non-circle cluster** could lead to incorrect clustering.
+![Not cicles](image/not_round.png)
+
+![Not circles run](image/not_round.gif)
+
+The same problem can happen to datasets having **uneven number of observations between clusters**.  
+![Uneven number of observations](image/unequal_run.gif)
 ## 5. References
 This blog is heavily inspired this [article](https://machinelearningcoban.com/2017/01/01/kmeans/). Most of the math I've introduced in the pdf file is taken from it (with some slight changes based on other sources and my understanding). I (probably) won't find any other detailed explanation like this article. More source,
 - [Deep Ai Khanhblog](https://phamdinhkhanh.github.io/deepai-book/ch_ml/KMeans.html#su-hoi-tu-cua-thuat-toan-k-means-clustering): another detailed Vietnamese blog from 
